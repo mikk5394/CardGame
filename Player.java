@@ -1,5 +1,3 @@
-package com.company;
-
 import java.util.ArrayList;
 
 public class Player {
@@ -25,12 +23,33 @@ public class Player {
         return currentHand;
     }
 
+    public Card getCurrentHand1(){
+        return currentHand.get(0);
+    }
+
+    public Card getCurrentHand2(){
+        return currentHand.get(1);
+    }
+
+    public Card getCurrentHand3(){
+        return currentHand.get(2);
+    }
+
     public ArrayList<Card> getFront() {
         return front;
     }
 
     public ArrayList<Card> getEnd() {
         return end;
+    }
+
+    public void getNewCard(Player player){
+        double d = (Math.random()*Deck.deckSizeChecker());
+        int randomCard = (int) d;
+
+        player.getCurrentHand().add(Deck.getDeckOfCards().get(randomCard));
+        System.out.println(player.getName() + ", received " + Deck.getDeckOfCards().get(randomCard));
+        Deck.removeCard(randomCard);
     }
 
     @Override

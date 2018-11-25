@@ -1,5 +1,4 @@
-package com.company;
-
+import java.sql.Array;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
@@ -11,31 +10,11 @@ public class Menu {
     private ArrayList<Player> numOfPlayers = new ArrayList<>();
 
     public Menu(){
-        System.out.println("Welcome to SHITFACE! \nSelect the number of players (4 is max):");
 
-        int numPlayers;
-        while (true){
-            try {
-
-                numPlayers = sc.nextInt();
-                if (numPlayers >= 2 && numPlayers <= 4){
-                    System.out.println("Number of players: " + numPlayers);
-                    System.out.println();
-                    break;
-                }
-                System.out.println("Number of players must be between 2 and 4.");
-
-            } catch (InputMismatchException ime){
-                System.out.println("Input must be a number.");
-                sc.nextLine();
-            }
-        }
-
-        //setupGame(numPlayers);
         // HARDCODER 2 SPILLERE TIL TEST
         Player player1 = new Player("Mikkel");
         numOfPlayers.add(player1);
-        Player player2 = new Player("Anders");
+        Player player2 = new Player("TestSpiller");
         numOfPlayers.add(player2);
 
         dealStart(numOfPlayers);
@@ -45,13 +24,11 @@ public class Menu {
             changeFrontStart(p);
         }
 
-
         System.out.println("Player: " + checkWhoStarts(numOfPlayers) + " starts as he has the lowest card.");
 
         playTillNoDeck(numOfPlayers);
-
     }
-    //missing functionality for 3 and 4 players
+
     public void setupGame(int numPlayers){
         Scanner nameInput = new Scanner(System.in);
         if(numPlayers == 2){
@@ -315,9 +292,171 @@ public class Menu {
 
     public void playTillNoDeck(ArrayList<Player> list){
 
-        boolean cardsLeft = true;
-        while (cardsLeft){
+        //makes sure the player with the lowest card starts.
+        ArrayList<Player> players = new ArrayList<>();
+        players.add(list.get(0));
+        players.add(list.get(1));
+        Player player1 = checkWhoStarts(players);
+        players.remove(player1);
+        Player player2 = players.get(0);
+
+        newLine();
+
+        while (!Deck.getDeckOfCards().isEmpty()){
+
+            throwCardInPile(player1);
+            player1.getNewCard(player1);
+            newLine();
+            System.out.println("Top card in pile: " + Deck.getPileOfCards().get(Deck.getPileOfCards().size()-1));
+
+            throwCardInPile(player2);
+            player1.getNewCard(player2);
+            newLine();
+            System.out.println("Top card in pile: " + Deck.getPileOfCards().get(Deck.getPileOfCards().size()-1));
 
         }
+    }
+
+    public void throwCardInPile(Player player) {
+
+        Scanner input = new Scanner(System.in);
+        String answer;
+        System.out.println(player.getName() + ", pick a card to throw in the pile: " + player.getCurrentHand() + ":");
+
+        while (true) {
+
+            answer = input.nextLine();
+
+            if (answer.equals("1")) {
+                if (!Deck.getPileOfCards().isEmpty()) {
+                    if ((Deck.getTopCard().getRank().getNumber() <=
+                            player.getCurrentHand1().getRank().getNumber())) {
+
+                        if (player.getCurrentHand1().getRank().equals(Ranks.TWO)) {
+                            Deck.getPileOfCards().add(player.getCurrentHand1());
+                            player.getCurrentHand().remove(0);
+                            Deck.getTopCard().getRank().setNumber(1);
+                        } else if (player.getCurrentHand1().getRank().equals(Ranks.THREE)) {
+                            Deck.getPileOfCards().add(player.getCurrentHand1());
+                            player.getCurrentHand().remove(0);
+                            //sets the three to whatever value was on top of the pile before it was thrown
+                            Deck.getTopCard().getRank().setNumber(Deck.getPileOfCards().get(Deck.getPileOfCards().size() - 2).getRank().getNumber());
+                        } else if (player.getCurrentHand1().getRank().equals(Ranks.TEN)) {
+                            Deck.getPileOfCards().add(player.getCurrentHand1());
+                            player.getCurrentHand().remove(0);
+                            //removes the pile as the card TEN removes/resets the pile
+                            Deck.getPileOfCards().removeAll(Deck.getPileOfCards());
+                            System.out.println("Pile reset. " + player.getName() + " gets to throw another card in the pile.");
+                            throwCardInPile(player);
+                        } else if (player.getCurrentHand1().getRank().equals(Ranks.EIGHT)) {
+                            Deck.getPileOfCards().add(player.getCurrentHand1());
+                            player.getCurrentHand().remove(0);
+                            //player gets another turn
+                            System.out.println(player.getName() + "'s turn again.");
+                            throwCardInPile(player);
+                        }
+
+                        //Code below executes if TWO, THREE, EIGHT or TEN isn't thrown in the pile.
+                        Deck.getPileOfCards().add(player.getCurrentHand1());
+                        player.getCurrentHand().remove(0);
+                        break;
+                    } else {
+                        System.out.println("Selected card must be of the same value or higher, or be a 2, 3 or 10.");
+                    }
+                } else {
+                    Deck.getPileOfCards().add(player.getCurrentHand1());
+                    player.getCurrentHand().remove(0);
+                    break;
+                }
+
+            } else if (answer.equals("2")) {
+                if (!Deck.getPileOfCards().isEmpty()) {
+                    if ((Deck.getTopCard().getRank().getNumber() <=
+                            player.getCurrentHand2().getRank().getNumber())) {
+
+                        if (player.getCurrentHand2().getRank().equals(Ranks.TWO)) {
+                            Deck.getPileOfCards().add(player.getCurrentHand2());
+                            player.getCurrentHand().remove(1);
+                            Deck.getTopCard().getRank().setNumber(1);
+                        } else if (player.getCurrentHand2().getRank().equals(Ranks.THREE)) {
+                            Deck.getPileOfCards().add(player.getCurrentHand2());
+                            player.getCurrentHand().remove(1);
+                            //sets the three to whatever value was on top of the pile before it was thrown
+                            Deck.getTopCard().getRank().setNumber(Deck.getPileOfCards().get(Deck.getPileOfCards().size() - 2).getRank().getNumber());
+                        } else if (player.getCurrentHand2().getRank().equals(Ranks.TEN)) {
+                            Deck.getPileOfCards().add(player.getCurrentHand2());
+                            player.getCurrentHand().remove(1);
+                            //removes the pile as the card TEN removes/resets the pile
+                            Deck.getPileOfCards().removeAll(Deck.getPileOfCards());
+                            System.out.println("Pile reset. " + player.getName() + " gets to throw another card in the pile.");
+                            throwCardInPile(player);
+                        } else if (player.getCurrentHand2().getRank().equals(Ranks.EIGHT)) {
+                            Deck.getPileOfCards().add(player.getCurrentHand2());
+                            player.getCurrentHand().remove(1);
+                            //player gets another turn
+                            System.out.println(player.getName() + "'s turn again.");
+                            throwCardInPile(player);
+                        }
+
+                        //Code below executes if TWO, THREE, EIGHT or TEN isn't thrown in the pile.
+                        Deck.getPileOfCards().add(player.getCurrentHand2());
+                        player.getCurrentHand().remove(1);
+                        break;
+                    } else {
+                        System.out.println("Selected card must be of the same value or higher, or be a 2, 3 or 10.");
+                    }
+                } else {
+                    Deck.getPileOfCards().add(player.getCurrentHand2());
+                    player.getCurrentHand().remove(1);
+                    break;
+                }
+
+            } else if (answer.equals("3")) {
+                if (!Deck.getPileOfCards().isEmpty()) {
+                    if ((Deck.getTopCard().getRank().getNumber() <=
+                            player.getCurrentHand3().getRank().getNumber())) {
+
+                        if (player.getCurrentHand3().getRank().equals(Ranks.TWO)) {
+                            Deck.getPileOfCards().add(player.getCurrentHand3());
+                            player.getCurrentHand().remove(2);
+                            Deck.getTopCard().getRank().setNumber(1);
+                        } else if (player.getCurrentHand3().getRank().equals(Ranks.THREE)) {
+                            Deck.getPileOfCards().add(player.getCurrentHand3());
+                            player.getCurrentHand().remove(2);
+                            //sets the three to whatever value was on top of the pile before it was thrown
+                            Deck.getTopCard().getRank().setNumber(Deck.getPileOfCards().get(Deck.getPileOfCards().size() - 2).getRank().getNumber());
+                        } else if (player.getCurrentHand3().getRank().equals(Ranks.TEN)) {
+                            Deck.getPileOfCards().add(player.getCurrentHand3());
+                            player.getCurrentHand().remove(2);
+                            //removes the pile as the card TEN removes/resets the pile
+                            Deck.getPileOfCards().removeAll(Deck.getPileOfCards());
+                            System.out.println("Pile reset. " + player.getName() + " gets to throw another card in the pile.");
+                            throwCardInPile(player);
+                        } else if (player.getCurrentHand3().getRank().equals(Ranks.EIGHT)) {
+                            Deck.getPileOfCards().add(player.getCurrentHand1());
+                            player.getCurrentHand().remove(2);
+                            //player gets another turn
+                            System.out.println(player.getName() + "'s turn again.");
+                            throwCardInPile(player);
+                        }
+
+                        //Code below executes if TWO, THREE, EIGHT or TEN isn't thrown in the pile.
+                        Deck.getPileOfCards().add(player.getCurrentHand3());
+                        player.getCurrentHand().remove(2);
+                        break;
+                    } else {
+                        System.out.println("Selected card must be of the same value or higher, or be a 2, 3 or 10.");
+                    }
+                } else {
+                    Deck.getPileOfCards().add(player.getCurrentHand3());
+                    player.getCurrentHand().remove(2);
+                    break;
+                }
+            }
+        }
+    }
+
+    public void newLine (){
+        System.out.println();
     }
 }

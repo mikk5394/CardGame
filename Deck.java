@@ -1,5 +1,3 @@
-package com.company;
-
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -7,6 +5,7 @@ public class Deck {
 
     private static final Deck deckObject = new Deck();
     private static ArrayList<Card> deckOfCards = new ArrayList<>();
+    private static ArrayList<Card> pileOfCards = new ArrayList<>();
 
     private Deck (){ }
 
@@ -26,7 +25,7 @@ public class Deck {
 
     public static void giveCardEnd(Player player){
 
-        for (int i= 0; i < 3; i++){
+        for (int i = 0; i < 3; i++){
 
             double d = (Math.random()*Deck.deckSizeChecker());
             int randomCard = (int) d;
@@ -60,9 +59,12 @@ public class Deck {
         }
     }
 
-
     public static ArrayList<Card> getDeckOfCards() {
         return deckOfCards;
+    }
+
+    public static ArrayList<Card> getPileOfCards() {
+        return pileOfCards;
     }
 
     public static void removeCard(int index){
@@ -71,6 +73,10 @@ public class Deck {
 
     public static int deckSizeChecker(){
         return Deck.getDeckOfCards().size();
+    }
+
+    public static Card getTopCard (){
+        return Deck.getPileOfCards().get(Deck.getPileOfCards().size()-1);
     }
 
     @Override

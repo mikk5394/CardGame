@@ -1,5 +1,3 @@
-package com.company;
-
 public class Card {
 
     private Suits suit;
@@ -13,6 +11,7 @@ public class Card {
     public Ranks getRank() {
         return rank;
     }
+
 
     @Override
     public String toString() {
